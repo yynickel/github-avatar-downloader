@@ -22,7 +22,6 @@ function downloadImageByURL(url, filePath) {
       throw err;
     })
     .on('response', function(response) {
-      console.log(response, response.statusMessage, response.headers['content-type']);
       console.log("Downloading image...");
     })
     .pipe(fs.createWriteStream(filePath))
@@ -31,14 +30,13 @@ function downloadImageByURL(url, filePath) {
     })
 }
 
-downloadImageByURL("https://avatars2.githubusercontent.com/u/2741?v=3&s=466", "avatars/kvirani.jpg");
-
-
-
-// getRepoContributors("jquery", "jquery", function(err, result) {
-//   console.log("Errors:", err);
-//   let avatarUrls = result.map(x => x.avatar_url);
-//   console.log("Result:", avatarUrls);
-// });
+getRepoContributors("jquery", "jquery", function(err, result) {
+  console.log("Errors:", err);
+  let avatarUrls = result.map(x => x.avatar_url);
+  let userNames = result.map(x => x.login);
+  for (let i = 0; i < avatarUrls.length; i++) {
+    downloadImageByURL(avatarUrls[i], "avatars/" + userNames[i] + ".jpg");
+  }
+});
 
 console.log('Welcome to the GitHub Avatar Downloader!');

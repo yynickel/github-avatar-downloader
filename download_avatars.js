@@ -1,7 +1,9 @@
 var request = require('request');
 let fs = require('fs');
-
 let token = require('./secret');
+
+let repoOwner = process.argv[2];
+let repoName = process.argv[3];
 
 function getRepoContributors(repoOwner, repoName, cb) {
   var options = {
@@ -30,7 +32,7 @@ function downloadImageByURL(url, filePath) {
     })
 }
 
-getRepoContributors("jquery", "jquery", function(err, result) {
+getRepoContributors(repoOwner, repoName, function(err, result) {
   console.log("Errors:", err);
   let avatarUrls = result.map(x => x.avatar_url);
   let userNames = result.map(x => x.login);

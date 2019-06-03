@@ -11,13 +11,14 @@ function getRepoContributors(repoOwner, repoName, cb) {
     authorization: token
   };
   request(options, function(err, res, body) {
-    cb(err, body);
+    cb(err, JSON.parse(body));
   });
 }
 
 getRepoContributors("jquery", "jquery", function(err, result) {
   console.log("Errors:", err);
-  console.log("Result:", result);
+  let avatarUrls = result.map(x => x.avatar_url);
+  console.log("Result:", avatarUrls);
 });
 
 console.log('Welcome to the GitHub Avatar Downloader!');

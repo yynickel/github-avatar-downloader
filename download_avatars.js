@@ -8,9 +8,13 @@ function getRepoContributors(repoOwner, repoName, cb) {
     headers: {
       'User-Agent': 'request'
     },
-    authorization: process.env.GITHUB_token
+    authorization: process.env.GITHUB_TOKEN
   };
   request(options, function(err, res, body) {
+    if (res.statusCode !== 200) {
+      console.log("error: status code " + res.statusCode);
+      process.exit(1);
+    };
     cb(err, JSON.parse(body));
   });
 }
@@ -29,22 +33,25 @@ function downloadImageByURL(url, filePath) {
     })
 }
 
+if (!process.env.GITHUB_TOKEN) {
+  console.log(".env is missing or authorization information is missing");
+  process.exit(1);
+}
+
 let args = process.argv;
 if (args.length !== 4) {
-  setTimeout((function() {
-    console.log("Program terminated due to incorrect number of arguments!\nusage: node download_avatars.js <repo owner> <repo name>");
-    return process.exit(1);
-  }), 50);
-} else {
-  console.log('Welcome to the GitHub Avatar Downloader!');
-  let repoOwner = process.argv[2];
-  let repoName = process.argv[3];
-  getRepoContributors(repoOwner, repoName, function(err, result) {
-    console.log("Errors:", err);
-    let avatarUrls = result.map(x => x.avatar_url);
-    let userNames = result.map(x => x.login);
-    for (let i = 0; i < avatarUrls.length; i++) {
-      downloadImageByURL(avatarUrls[i], "avatars/" + userNames[i] + ".jpg");
-    }
-  });
+  console.log("Program terminated due to incorrect number of arguments!\nusage: node download_avatars.js <repo owner> <repo name>");
+  process.exit(1);
 }
+
+console.log('Welcome to the GitHub Avatar Downloader!');
+let repoOwner = process.argv[2];
+let repoName = process.argv[3];
+getRepoContributors(repoOwner, repoName, function(err, result) {
+  if (err) throw err;
+  let avatarUrls = result.map(x => x.avatar_url);
+  let userNames = result.map(x => x.login);
+  for (let i = 0; i < avatarUrls.length; i++) {
+    downloadImageByURL(avatarUrls[i], "avatars/" + userNames[i] + ".jpg");
+  }
+});
